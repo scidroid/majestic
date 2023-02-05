@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  created_at DateTime @default(now())
+
+  results Result[]
+}
+
+enum STATUS {
+  PENDING
+  PROCESSING
+  DONE
+  ERROR
+}
+
+model Result {
+  id             String   @id @default(cuid())
+  original_image String
+  result_image   String?
+  neutral        String
+  target         String
+  status         STATUS   @default(PENDING)
+  created_at     DateTime @default(now())
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+}
